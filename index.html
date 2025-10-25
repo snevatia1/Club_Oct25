@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Mahabaleshwar Booking Demo</title>
+    <style>
+        /* Base Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* Two-Pane Layout (50:50 Split) */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .left-pane, .right-pane {
+            flex: 1; /* 50% width */
+            padding: 20px;
+            overflow-y: auto; /* Allow scrolling within panes */
+        }
+
+        .left-pane {
+            border-right: 1px solid #ddd;
+            background-color: #fafafa;
+        }
+
+        /* Header Styling */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #a00; /* Club color accent */
+        }
+        .logo {
+            width: 50px;
+            height: 50px;
+            background-color: #a00; /* Placeholder for Logo */
+            margin-right: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .header h1 {
+            font-size: 1.5em;
+            margin: 0;
+            color: #333;
+        }
+        .booking-windows-note {
+            font-size: 0.8em;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        /* Calendar Mockup */
+        .calendar-mockup {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: white;
+        }
+        .month-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            background-color: #e0e0e0;
+            padding: 5px;
+            text-align: center;
+        }
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+        .day-cell {
+            padding: 8px 4px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            font-size: 0.9em;
+            user-select: none;
+        }
+        /* Color Coding for Demo */
+        .day-cell.weekend { background-color: #ffffe0; } /* Light yellow for Fri/Sat */
+        .day-cell.season { background-color: #ffdd80; } /* Dark yellow for Season */
+        .day-cell.special { background-color: #ff8080; color: white; } /* Red for Special Days */
+        .day-cell.selected { background-color: #007bff; color: white; border-color: #0056b3; }
+        .day-info { font-size: 0.7em; color: #666; margin-top: 2px;}
+
+        /* Right Pane Controls */
+        .right-pane h2 {
+            font-size: 1.2em;
+            color: #a00;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+
+        /* OTP/Login Area */
+        .auth-container {
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            background-color: #fffaf0; /* Light background for visibility */
+        }
+        .auth-container input, .auth-container button {
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .auth-container button {
+            background-color: #a00;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .auth-container button:hover {
+            background-color: #800;
+        }
+
+        /* Locked/Controls Area */
+        .controls-locked {
+            text-align: center;
+            color: #888;
+            padding: 50px 0;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            background-color: #eee;
+        }
+        .controls-form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .controls-form input[type="number"], .controls-form select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .booking-summary {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #a00;
+            background-color: #fcf8e3;
+        }
+        .booking-summary p { margin: 5px 0; }
+
+        .note {
+            font-size: 0.75em;
+            color: #555;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="left-pane">
+        <div class="header">
+            <div class="logo">CM</div>
+            <div>
+                <h1>Club Mahabaleshwar Booking</h1>
+                <div class="booking-windows-note">
+                    Booking days for **Member: 180**, **Member + Temp M: 90**, **Only Temp M: 60**.
+                </div>
+            </div>
+        </div>
+        
+        <h2>📅 Calendar & Availability</h2>
+        <p>Click Check-in then Check-out dates. Example availability shown below.</p>
+
+        <div class="calendar-mockup">
+            <div class="month-header">October 2025</div>
+            <div class="day-grid">
+                <div style="font-weight: bold;">Sun</div>
+                <div style="font-weight: bold;">Mon</div>
+                <div style="font-weight: bold;">Tue</div>
+                <div style="font-weight: bold;">Wed</div>
+                <div style="font-weight: bold;">Thu</div>
+                <div style="font-weight: bold;" class="weekend">Fri</div>
+                <div style="font-weight: bold;" class="weekend">Sat</div>
+
+                <div></div><div></div><div></div><div></div>
+
+                <div class="day-cell" data-date="2025-10-1">1<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-2">2<div class="day-info">Free: 38</div></div>
+                <div class="day-cell" data-date="2025-10-3 season weekend">3<div class="day-info">Free: 25</div></div>
+                <div class="day-cell" data-date="2025-10-4 season weekend">4<div class="day-info">Free: 20</div></div>
+
+                <div class="day-cell" data-date="2025-10-5 season">5<div class="day-info">Free: 28</div></div>
+                <div class="day-cell" data-date="2025-10-6 season">6<div class="day-info">Free: 35</div></div>
+                <div class="day-cell" data-date="2025-10-7">7<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-8">8<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-9">9<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-10 weekend">10<div class="day-info">Free: 30</div></div>
+                <div class="day-cell" data-date="2025-10-11 weekend">11<div class="day-info">Free: 28</div></div>
+
+                <div class="day-cell" data-date="2025-10-12">12<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-13">13<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-14">14<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-15 special">15<div class="day-info">Free: 5</div></div>
+                <div class="day-cell" data-date="2025-10-16 special">16<div class="day-info">Free: 5</div></div>
+                <div class="day-cell" data-date="2025-10-17 special weekend">17<div class="day-info">Free: 2</div></div>
+                <div class="day-cell" data-date="2025-10-18 special weekend">18<div class="day-info">Free: 0</div></div>
+
+                <div class="day-cell" data-date="2025-10-19">19<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-20">20<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-21">21<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-22">22<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-23">23<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-24 weekend">24<div class="day-info">Free: 30</div></div>
+                <div class="day-cell" data-date="2025-10-25 weekend">25<div class="day-info">Free: 30</div></div>
+
+                <div class="day-cell" data-date="2025-10-26">26<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-27">27<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-28">28<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-29">29<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-30">30<div class="day-info">Free: 39</div></div>
+                <div class="day-cell" data-date="2025-10-31 weekend">31<div class="day-info">Free: 30</div></div>
+            </div>
+        </div>
+        <p class="note">**Color Key:** <span style="color:#ffffe0; background-color: #ffffe0; border: 1px solid #ccc;">&nbsp;&nbsp;&nbsp;</span> Weekend | <span style="color:#ffdd80; background-color: #ffdd80; border: 1px solid #ccc;">&nbsp;&nbsp;&nbsp;</span> Season | <span style="color:#ff8080; background-color: #ff8080; border: 1px solid #ccc;">&nbsp;&nbsp;&nbsp;</span> Special Day (High Demand/Limited Availability)</p>
+    </div>
+
+    <div class="right-pane">
+        <div id="auth-section" class="auth-container">
+            <h2>🔒 Verify Membership (OTP + Dues Check)</h2>
+            <label for="member-id">Member ID/Mobile/Email:</label>
+            <input type="text" id="member-id" placeholder="Enter ID/Mobile for OTP">
+            <button onclick="sendOtp()">Send OTP</button>
+
+            <div id="otp-area" style="display:none;">
+                <label for="otp">Enter OTP:</label>
+                <input type="text" id="otp" placeholder="e.g., 123456">
+                <button onclick="verifyOtp()">Verify & Check Dues</button>
+            </div>
+        </div>
+
+        <div id="controls-section" class="controls-locked">
+            <p>Controls are **LOCKED**. Please verify membership via OTP/Dues Check to proceed.</p>
+        </div>
+
+        <div id="controls-unlocked" style="display:none;">
+            <h2>✅ Member: **Ms. ABC** (Dues: ₹0.00)</h2>
+            <p>Booking Window: **180 days** (Member Privilege)</p>
+
+            <div class="controls-form">
+                <h3>Booking Details</h3>
+                <label for="check-in">Check-in Date:</label>
+                <input type="text" id="check-in" value="N/A" readonly>
+                
+                <label for="check-out">Check-out Date:</label>
+                <input type="text" id="check-out" value="N/A" readonly>
+
+                <label for="rooms">Number of Rooms (Max 6):</label>
+                <input type="number" id="rooms" value="1" min="1" max="6">
+                
+                <h3>Party Details</h3>
+                <label for="members">Members/Dependents (Adults):</label>
+                <input type="number" id="members" value="2" min="1">
+
+                <label for="senior-members">Senior Members (65+):</label>
+                <input type="number" id="senior-members" value="0" min="0">
+                
+                <label for="children-under10">Children (&lt;10):</label>
+                <input type="number" id="children-under10" value="0" min="0">
+
+                <label for="temp-members">Temporary Members/Guests:</label>
+                <input type="number" id="temp-members" value="0" min="0">
+
+                <label for="room-type">Preferred Room Type:</label>
+                <select id="room-type">
+                    <option value="double">Double Occupancy (Default)</option>
+                    <option value="single">Single Occupancy</option>
+                    <option value="ac">AC Room</option>
+                    <option value="wheelchair">Wheelchair Access</option>
+                </select>
+                
+                <div class="booking-summary">
+                    <h4>📝 Estimated Summary (Dummy)</h4>
+                    <p>Nights: **3**</p>
+                    <p>Tariff: **₹5,250/night** (Regular Days)</p>
+                    <p>Extra Adult: **₹2,100**</p>
+                    <p>Total Estimated Cost: **₹17,850**</p>
+                    <button style="margin-top: 15px; background-color: green;">Submit Booking Request</button>
+                </div>
+
+                <p class="note">Filters & types (Wheelchair, Pet, AC, Single, 4 beds) would refine the availability shown on the left pane and update the Tariff estimate here.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DEMO JAVASCRIPT LOGIC ---
+
+    const authSection = document.getElementById('auth-section');
+    const otpArea = document.getElementById('otp-area');
+    const controlsLocked = document.getElementById('controls-section');
+    const controlsUnlocked = document.getElementById('controls-unlocked');
+    const calendarCells = document.querySelectorAll('.day-cell');
+    const checkInInput = document.getElementById('check-in');
+    const checkOutInput = document.getElementById('check-out');
+    
+    let checkInDate = null;
+    let checkOutDate = null;
+
+    // 1. Calendar Date Selection Logic
+    calendarCells.forEach(cell => {
+        cell.addEventListener('click', () => {
+            const date = cell.getAttribute('data-date');
+
+            if (!checkInDate || (checkInDate && checkOutDate)) {
+                // Start a new selection
+                resetSelection();
+                checkInDate = date;
+                cell.classList.add('selected');
+            } else if (date === checkInDate) {
+                // Deselect check-in
+                resetSelection();
+            } else if (date > checkInDate) {
+                // Select check-out
+                checkOutDate = date;
+                highlightRange(checkInDate, checkOutDate);
+            } else if (date < checkInDate) {
+                // New check-in, if user clicks a date before current check-in
+                resetSelection();
+                checkInDate = date;
+                cell.classList.add('selected');
+            }
+            
+            checkInInput.value = checkInDate ? checkInDate : 'N/A';
+            checkOutInput.value = checkOutDate ? checkOutDate : 'N/A';
+        });
+    });
+
+    function resetSelection() {
+        checkInDate = null;
+        checkOutDate = null;
+        calendarCells.forEach(c => c.classList.remove('selected'));
+    }
+
+    function highlightRange(start, end) {
+        calendarCells.forEach(cell => {
+            const date = cell.getAttribute('data-date');
+            if (date >= start && date < end) { // Check-out date is non-inclusive of last night
+                cell.classList.add('selected');
+            }
+        });
+    }
+
+    // 2. OTP/Login Logic
+    function sendOtp() {
+        const memberId = document.getElementById('member-id').value;
+        if (memberId) {
+            alert(`OTP sent to ${memberId}. (DEMO: Use '123' as the OTP to proceed)`);
+            otpArea.style.display = 'block';
+        } else {
+            alert('Please enter a Member ID/Mobile/Email.');
+        }
+    }
+
+    function verifyOtp() {
+        const otp = document.getElementById('otp').value;
+        // Simulating the check: OTP must be '123' AND Dues check must pass (Member 123 has 0 Dues)
+        // Member 234 (DEF) in your CSV has Due Amt 20, which would fail this check.
+        if (otp === '123') {
+            // SIMULATE SUCCESS: Dues clear & OTP correct
+            authSection.style.display = 'none';
+            controlsLocked.style.display = 'none';
+            controlsUnlocked.style.display = 'block';
+            alert('Login successful! Welcome Ms. ABC. Dues clear (₹0.00).');
+        } else if (otp === '124') { 
+            // SIMULATE FAILURE: Dues pending (e.g., Member 234 has ₹20 Dues)
+            alert('Login successful, but Dues Pending! Please clear ₹20.00 due amount to proceed with booking.');
+            // Keep controls locked
+        } else {
+            // SIMULATE FAILURE: OTP incorrect
+            alert('Invalid OTP. Please try again.');
+        }
+    }
+
+    // --- END OF DEMO JAVASCRIPT LOGIC ---
+</script>
+
+</body>
+</html>
