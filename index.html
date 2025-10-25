@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Club Mahabaleshwar Booking Demo v2</title>
+    <title>Club Mahabaleshwar Booking Demo v3 - Final Review</title>
     <style>
         /* Base Styling */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            height: 100vh; /* Ensure full viewport height */
+            background-color: #f0f2f5;
+            height: 100vh;
         }
 
         /* Two-Pane Layout (50:50 Split) */
         .app-container {
             display: flex;
-            height: 100%; /* Take full body height */
-            max-width: 1200px;
+            height: 100%;
+            max-width: 1400px; /* Slightly wider for better right-pane visibility */
             margin: 0 auto;
             border: 1px solid #ccc;
             background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
         }
 
         .left-pane, .right-pane {
-            flex: 1; /* 50% width */
-            padding: 15px; /* Reduced padding slightly */
-            overflow-y: auto; /* Allow scrolling within panes */
+            flex: 1; 
+            padding: 15px;
+            overflow-y: auto; /* Both panes are scrollable */
         }
 
         .left-pane {
@@ -36,122 +36,225 @@
             background-color: #fafafa;
         }
 
-        /* Header Styling */
+        /* --- LEFT PANE (CALENDAR) STYLING --- */
         .header {
             display: flex;
             align-items: center;
-            margin-bottom: 10px; /* Reduced margin */
-            padding-bottom: 5px; /* Reduced padding */
-            border-bottom: 2px solid #a00; /* Club color accent */
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 3px solid #a00; /* Club color accent */
         }
         .logo {
-            width: 40px; /* Smaller logo */
-            height: 40px;
-            background-color: #a00; /* Placeholder for Logo */
-            margin-right: 8px;
-            border-radius: 4px;
+            width: 45px; 
+            height: 45px;
+            background-color: #a00;
+            margin-right: 10px;
+            border-radius: 50%; /* Circle logo */
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
-            font-size: 0.8em;
+            font-weight: 900;
+            font-size: 1.1em;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
         }
         .header h1 {
-            font-size: 1.3em; /* Reduced size */
+            font-size: 1.4em;
             margin: 0;
-            color: #333;
+            color: #2c3e50;
         }
         .booking-windows-note {
-            font-size: 0.75em; /* Smaller font for the note */
-            color: #555;
+            font-size: 0.75em;
+            color: #7f8c8d;
             margin-top: 3px;
         }
 
-        /* Calendar Mockup */
         .calendar-mockup {
-            border: 1px solid #ccc;
-            padding: 5px; /* Reduced padding */
+            border: 1px solid #bdc3c7;
+            padding: 5px;
             margin-top: 10px;
             background-color: white;
-            margin-bottom: 15px; /* Spacing between months */
+            margin-bottom: 10px; /* Reduced spacing between months */
         }
         .month-header {
             font-weight: bold;
             margin-bottom: 5px;
-            background-color: #e0e0e0;
-            padding: 3px; /* Reduced padding */
+            background-color: #34495e;
+            color: white;
+            padding: 5px;
             text-align: center;
-            font-size: 0.9em;
+            font-size: 1em;
         }
         .day-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 2px; /* Reduced gap */
+            gap: 1px; /* Very small gap */
             text-align: center;
         }
         .day-cell {
-            padding: 4px 1px; /* Significantly reduced height/padding */
-            border: 1px solid #eee;
+            padding: 2px 1px; 
+            height: 40px; /* Fixed height for consistent look */
+            border: 1px solid #ecf0f1;
             cursor: pointer;
-            font-size: 0.8em; /* Smaller font */
+            font-size: 0.9em;
             user-select: none;
-            line-height: 1.2; /* Tighter line spacing */
+            line-height: 1.2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
         }
-        /* Color Coding for Demo */
-        .day-cell.weekend { background-color: #ffffe0; }
-        .day-cell.season { background-color: #ffdd80; }
-        .day-cell.special { background-color: #ff8080; color: white; }
-        .day-cell.selected { background-color: #007bff; color: white; border-color: #0056b3; }
+        .day-name {
+             font-weight: bold;
+             padding: 4px 0;
+             background-color: #ecf0f1;
+             color: #34495e;
+        }
+        /* Coloring based on rules */
+        .day-cell.weekend { background-color: #fcf8e3; } /* Light yellow for Fri/Sat */
+        .day-cell.season { background-color: #f7dc6f; } /* Dark yellow for Season */
+        .day-cell.special { background-color: #e74c3c; color: white; } /* Red for Special Days */
+        .day-cell.selected { background-color: #2980b9; color: white; border-color: #2c3e50; }
+        
+        .day-number {
+            font-weight: bold;
+            font-size: 1.1em; /* Larger date number */
+            line-height: 1;
+        }
         .day-info { 
-            font-size: 0.65em; /* Smaller font for availability */
-            color: #666; 
-            margin-top: 2px;
-            font-weight: bold; /* Keep count visible */
+            font-size: 0.85em; /* Larger font for availability */
+            color: #27ae60; /* Green for available count */
+            margin-top: 1px;
+            font-weight: 700;
+        }
+        .day-cell.special .day-info {
+            color: white;
+        }
+
+
+        /* --- RIGHT PANE (CONTROLS) STYLING --- */
+        .right-pane h2 {
+            font-size: 1.3em;
+            color: #a00;
+            padding-bottom: 5px;
+            margin-top: 5px;
+            text-align: center;
+        }
+        .member-info {
+            background-color: #e8f8f5;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #1abc9c;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+        .section-header {
+            font-size: 1.1em;
+            color: #34495e;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 5px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* Grid Layout for Input Fields */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Two columns */
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-bottom: 2px;
+            color: #2c3e50;
+        }
+        .input-group input, .input-group select {
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 0.9em;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+
+        .full-width {
+            grid-column: span 2;
         }
         
-        /* Right Pane Controls */
-        .right-pane h2 {
-            font-size: 1.2em;
-            color: #a00;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
-            margin-top: 0;
+        /* Details and Summary */
+        .details-names {
+            border: 1px solid #f39c12;
+            padding: 10px;
+            background-color: #fefcf5;
+            margin-bottom: 15px;
+            border-radius: 5px;
         }
-
-        .controls-unlocked {
-            display: block !important; /* Force unlocked view */
-        }
-
-        .controls-form label {
-            display: block;
-            margin-top: 8px; /* Reduced margin */
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        .controls-form input, .controls-form select {
+        .details-names table {
             width: 100%;
-            padding: 6px; /* Reduced padding */
-            margin-top: 3px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 0.9em;
+            border-collapse: collapse;
+        }
+        .details-names th, .details-names td {
+            padding: 5px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 0.85em;
+        }
+        .details-names th {
+            background-color: #f1c40f;
+            color: white;
         }
 
         .booking-summary {
-            margin-top: 15px;
-            padding: 10px; /* Reduced padding */
-            border: 1px solid #a00;
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #a00;
             background-color: #fcf8e3;
+            border-radius: 6px;
         }
-        .booking-summary p { margin: 3px 0; font-size: 0.9em; }
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 1em;
+        }
+        .summary-total {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #a00;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .submit-button {
+            margin-top: 15px;
+            background-color: #27ae60;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: background-color 0.2s;
+        }
+        .submit-button:hover { background-color: #229954; }
 
         .note {
             font-size: 0.75em;
-            color: #555;
+            color: #7f8c8d;
             margin-top: 15px;
-            padding-top: 8px;
+            padding-top: 10px;
             border-top: 1px solid #ddd;
         }
     </style>
@@ -165,257 +268,134 @@
             <div>
                 <h1>Club Mahabaleshwar Booking</h1>
                 <div class="booking-windows-note">
-                    Booking days for **Group/Member: 180**, **Member + Temp M: 90**, **Only Temp M: 60**.
+                    Booking days for **Group/Member: 180**, **Member + Dependent: 90**, **Unaccompanied Dependent: 60**.
                 </div>
             </div>
         </div>
         
-        <h2>📅 Calendar & Availability</h2>
-        <p style="font-size: 0.85em;">Click Check-in then Check-out dates. Availability shown below.</p>
+        <h2 style="font-size: 1.2em; color: #34495e;">📅 Calendar & Availability (180 Days View)</h2>
+        <p style="font-size: 0.85em; margin-bottom: 10px;">Select Check-in then Check-out dates. Availability is rooms free in all blocks.</p>
 
         <div class="calendar-mockup">
             <div class="month-header">October 2025</div>
             <div class="day-grid">
-                <div style="font-weight: bold;">Sun</div>
-                <div style="font-weight: bold;">Mon</div>
-                <div style="font-weight: bold;">Tue</div>
-                <div style="font-weight: bold;">Wed</div>
-                <div style="font-weight: bold;">Thu</div>
-                <div style="font-weight: bold;" class="weekend">Fri</div>
-                <div style="font-weight: bold;" class="weekend">Sat</div>
-
+                <div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name weekend">Fri</div><div class="day-name weekend">Sat</div>
                 <div></div><div></div><div></div><div></div>
-
-                <div class="day-cell" data-date="2025-10-1">1<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-2">2<div class="day-info">38</div></div>
-                <div class="day-cell" data-date="2025-10-3 season weekend">3<div class="day-info">25</div></div>
-                <div class="day-cell" data-date="2025-10-4 season weekend">4<div class="day-info">20</div></div>
-
-                <div class="day-cell" data-date="2025-10-5 season">5<div class="day-info">28</div></div>
-                <div class="day-cell" data-date="2025-10-6 season">6<div class="day-info">35</div></div>
-                <div class="day-cell" data-date="2025-10-7">7<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-8">8<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-9">9<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-10 weekend">10<div class="day-info">30</div></div>
-                <div class="day-cell" data-date="2025-10-11 weekend">11<div class="day-info">28</div></div>
-
-                <div class="day-cell" data-date="2025-10-12">12<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-13">13<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-14">14<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-15 special">15<div class="day-info">5</div></div>
-                <div class="day-cell" data-date="2025-10-16 special">16<div class="day-info">5</div></div>
-                <div class="day-cell" data-date="2025-10-17 special weekend">17<div class="day-info">2</div></div>
-                <div class="day-cell" data-date="2025-10-18 special weekend">18<div class="day-info">0</div></div>
-
-                <div class="day-cell" data-date="2025-10-19">19<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-20">20<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-21">21<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-22">22<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-23">23<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-24 weekend">24<div class="day-info">30</div></div>
-                <div class="day-cell" data-date="2025-10-25 weekend">25<div class="day-info">30</div></div>
-
-                <div class="day-cell" data-date="2025-10-26">26<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-27">27<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-28">28<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-29">29<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-30">30<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-10-31 weekend">31<div class="day-info">30</div></div>
+                <div class="day-cell" data-date="2025-10-1"><div class="day-number">1</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-2"><div class="day-number">2</div><div class="day-info">38</div></div>
+                <div class="day-cell weekend" data-date="2025-10-3"><div class="day-number">3</div><div class="day-info">25</div></div>
+                <div class="day-cell weekend" data-date="2025-10-4"><div class="day-number">4</div><div class="day-info">20</div></div>
+                <div class="day-cell" data-date="2025-10-5"><div class="day-number">5</div><div class="day-info">28</div></div>
+                <div class="day-cell" data-date="2025-10-6"><div class="day-number">6</div><div class="day-info">35</div></div>
+                <div class="day-cell" data-date="2025-10-7"><div class="day-number">7</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-8"><div class="day-number">8</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-9"><div class="day-number">9</div><div class="day-info">39</div></div>
+                <div class="day-cell weekend" data-date="2025-10-10"><div class="day-number">10</div><div class="day-info">30</div></div>
+                <div class="day-cell weekend" data-date="2025-10-11"><div class="day-number">11</div><div class="day-info">28</div></div>
+                <div class="day-cell" data-date="2025-10-12"><div class="day-number">12</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-13"><div class="day-number">13</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-14"><div class="day-number">14</div><div class="day-info">39</div></div>
+                <div class="day-cell special" data-date="2025-10-15"><div class="day-number">15</div><div class="day-info">5</div></div>
+                <div class="day-cell special" data-date="2025-10-16"><div class="day-number">16</div><div class="day-info">5</div></div>
+                <div class="day-cell special weekend" data-date="2025-10-17"><div class="day-number">17</div><div class="day-info">2</div></div>
+                <div class="day-cell special weekend" data-date="2025-10-18"><div class="day-number">18</div><div class="day-info">0</div></div>
+                <div class="day-cell" data-date="2025-10-19"><div class="day-number">19</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-20"><div class="day-number">20</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-21"><div class="day-number">21</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-22"><div class="day-number">22</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-23"><div class="day-number">23</div><div class="day-info">39</div></div>
+                <div class="day-cell weekend" data-date="2025-10-24"><div class="day-number">24</div><div class="day-info">30</div></div>
+                <div class="day-cell weekend" data-date="2025-10-25"><div class="day-number">25</div><div class="day-info">30</div></div>
+                <div class="day-cell" data-date="2025-10-26"><div class="day-number">26</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-27"><div class="day-number">27</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-28"><div class="day-number">28</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-29"><div class="day-number">29</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-10-30"><div class="day-number">30</div><div class="day-info">39</div></div>
+                <div class="day-cell weekend" data-date="2025-10-31"><div class="day-number">31</div><div class="day-info">30</div></div>
             </div>
         </div>
-        
+
         <div class="calendar-mockup">
             <div class="month-header">November 2025</div>
             <div class="day-grid">
-                <div style="font-weight: bold;">Sun</div>
-                <div style="font-weight: bold;">Mon</div>
-                <div style="font-weight: bold;">Tue</div>
-                <div style="font-weight: bold;">Wed</div>
-                <div style="font-weight: bold;">Thu</div>
-                <div style="font-weight: bold;" class="weekend">Fri</div>
-                <div style="font-weight: bold;" class="weekend">Sat</div>
-
-                <div></div><div></div><div></div><div></div><div></div><div></div> 
-                
-                <div class="day-cell" data-date="2025-11-1 weekend">1<div class="day-info">25</div></div>
-
-                <div class="day-cell" data-date="2025-11-2">2<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-3">3<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-4">4<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-5">5<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-6">6<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-7 weekend">7<div class="day-info">30</div></div>
-                <div class="day-cell" data-date="2025-11-8 weekend">8<div class="day-info">30</div></div>
-                
-                <div class="day-cell" data-date="2025-11-9">9<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-10">10<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-11">11<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-12">12<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-13">13<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-14 weekend">14<div class="day-info">30</div></div>
-                <div class="day-cell" data-date="2025-11-15 weekend">15<div class="day-info">28</div></div>
-
-                <div class="day-cell" data-date="2025-11-16">16<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-17">17<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-18">18<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-19">19<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-20">20<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-21 weekend">21<div class="day-info">30</div></div>
-                <div class="day-cell" data-date="2025-11-22 weekend">22<div class="day-info">30</div></div>
-
-                <div class="day-cell" data-date="2025-11-23">23<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-24">24<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-25">25<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-26">26<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-27">27<div class="day-info">39</div></div>
-                <div class="day-cell" data-date="2025-11-28 weekend">28<div class="day-info">30</div></div>
-                <div class="day-cell" data-date="2025-11-29 weekend">29<div class="day-info">30</div></div>
-
-                <div class="day-cell" data-date="2025-11-30">30<div class="day-info">39</div></div>
-                
+                <div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name weekend">Fri</div><div class="day-name weekend">Sat</div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div class="day-cell weekend" data-date="2025-11-1"><div class="day-number">1</div><div class="day-info">25</div></div>
+                <div class="day-cell" data-date="2025-11-2"><div class="day-number">2</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-3"><div class="day-number">3</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-4"><div class="day-number">4</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-5"><div class="day-number">5</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-6"><div class="day-number">6</div><div class="day-info">39</div></div>
+                <div class="day-cell weekend" data-date="2025-11-7"><div class="day-number">7</div><div class="day-info">30</div></div>
+                <div class="day-cell weekend" data-date="2025-11-8"><div class="day-number">8</div><div class="day-info">30</div></div>
+                <div class="day-cell" data-date="2025-11-9"><div class="day-number">9</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-10"><div class="day-number">10</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-11"><div class="day-number">11</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-12"><div class="day-number">12</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-13"><div class="day-number">13</div><div class="day-info">39</div></div>
+                <div class="day-cell weekend" data-date="2025-11-14"><div class="day-number">14</div><div class="day-info">30</div></div>
+                <div class="day-cell weekend" data-date="2025-11-15"><div class="day-number">15</div><div class="day-info">28</div></div>
+                <div class="day-cell" data-date="2025-11-16"><div class="day-number">16</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-17"><div class="day-number">17</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-18"><div class="day-number">18</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-19"><div class="day-number">19</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-20"><div class="day-number">20</div><div class="day-info">39</div></div>
+                <div class="day-cell weekend" data-date="2025-11-21"><div class="day-number">21</div><div class="day-info">30</div></div>
+                <div class="day-cell weekend" data-date="2025-11-22"><div class="day-number">22</div><div class="day-info">30</div></div>
+                <div class="day-cell" data-date="2025-11-23"><div class="day-number">23</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-24"><div class="day-number">24</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-25"><div class="day-number">25</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-26"><div class="day-number">26</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-11-27"><div class="day-number">27</div><div class="day-info">39</div></div>
+                <div class="day-cell weekend" data-date="2025-11-28"><div class="day-number">28</div><div class="day-info">30</div></div>
+                <div class="day-cell weekend" data-date="2025-11-29"><div class="day-number">29</div><div class="day-info">30</div></div>
+                <div class="day-cell" data-date="2025-11-30"><div class="day-number">30</div><div class="day-info">39</div></div>
             </div>
         </div>
-        
+
         <div class="calendar-mockup">
-            <div class="month-header">December 2025</div>
-            </div>
-        <p class="note">**Color Key:** <span style="color:#ffffe0; background-color: #ffffe0; border: 1px solid #ccc;">&nbsp;&nbsp;&nbsp;</span> Weekend | <span style="color:#ffdd80; background-color: #ffdd80; border: 1px solid #ccc;">&nbsp;&nbsp;&nbsp;</span> Season | <span style="color:#ff8080; background-color: #ff8080; border: 1px solid #ccc;">&nbsp;&nbsp;&nbsp;</span> Special Day (High Demand/Limited)</p>
-    </div>
-
-    <div class="right-pane">
-        <div id="controls-unlocked" class="controls-unlocked">
-            <h2>✅ Member: **Ms. ABC** (Mem No. 123)</h2>
-            <p style="font-weight: bold; color: green; font-size: 0.9em;">Dues Status: Clear (₹0.00)</p>
-            <p style="font-size: 0.85em;">Booking Window: **180 days** (Member/Group Privilege)</p>
-            
-            <div class="controls-form">
-                <h3 style="margin-top: 15px; font-size: 1.1em; color: #333;">Booking Details</h3>
-                <label for="check-in">Check-in Date:</label>
-                <input type="text" id="check-in" value="2025-10-05" readonly>
-                
-                <label for="check-out">Check-out Date:</label>
-                <input type="text" id="check-out" value="2025-10-08" readonly>
-
-                <label for="rooms">Number of Rooms (Max 6):</label>
-                <input type="number" id="rooms" value="2" min="1" max="6">
-                
-                <h3 style="margin-top: 15px; font-size: 1.1em; color: #333;">Party Details (Max 4 persons per Double Room)</h3>
-                <label for="members">Members/Dependents (Adults):</label>
-                <input type="number" id="members" value="2" min="1">
-
-                <label for="senior-members">Senior Members (65+):</label>
-                <input type="number" id="senior-members" value="0" min="0">
-                
-                <label for="children-under10">Children (<10):</label>
-                <input type="number" id="children-under10" value="1" min="0">
-
-                <label for="temp-members">Temporary Members/Guests:</label>
-                <input type="number" id="temp-members" value="1" min="0">
-
-                <label for="room-type">Preferred Room Type / Filter:</label>
-                <select id="room-type">
-                    <option value="double">Double Occupancy (Default)</option>
-                    <option value="ac">AC Room Only</option>
-                    <option value="wheelchair">Wheelchair Access Only</option>
-                    <option value="single">Single Occupancy</option>
-                </select>
-                
-                <label for="meals">Required Meals (Dinner, Breakfast):</label>
-                <input type="number" id="meals" value="4" min="0" placeholder="Total no. of people for meals">
-                <p class="note" style="margin-top: 0; padding-top: 0; border: none;">* Meals count (4) must match occupants (2M + 1C + 1G = 4) in the party.</p>
-
-                <div class="booking-summary">
-                    <h4>📝 Estimated Summary (Dummy Calculation)</h4>
-                    <p>Nights: **3** (5th Oct to 8th Oct)</p>
-                    <p>Rooms: **2** (Member Rate)</p>
-                    <p>Base Tariff (2 Rooms): **₹10,500/night** (2 x ₹5,250)</p>
-                    <p>Temp Guest Extra Adult: **₹2,100/night** (Temp M is treated as Extra Adult for billing)</p>
-                    <p>Meals/Other Charges: **₹1,500**</p>
-                    <p style="font-size: 1.1em; font-weight: bold; color: #a00;">Total Estimated Cost: **₹35,200**</p>
-                    <button style="margin-top: 15px; background-color: green; padding: 10px; width: 100%; border: none; color: white; cursor: pointer; font-weight: bold;">Submit Booking Request</button>
-                    <p class="note" style="text-align: center; border: none; padding-top: 5px;">* Final cost subject to verification and meal plan selection.</p>
-                </div>
-
-                <div style="margin-top: 20px; padding: 10px; border: 1px dashed #ccc; background-color: #fff;">
-                    **MC Approval Checklist:** (This is where the app guides users on rules)
-                    <ul>
-                        <li style="color: green;">✓ Check-in/Check-out dates valid.</li>
-                        <li style="color: orange;">⚠ Max 6 rooms/member rule check. (OK: 2 rooms)</li>
-                        <li style="color: green;">✓ Party size (4) within room capacity (Max 8 in 2 rooms).</li>
-                        <li style="color: green;">✓ Booking window (180 days) check.</li>
-                    </ul>
-                </div>
+            <div class="month-header">December 2025 (Christmas Season: 19 Dec - 4 Jan)</div>
+            <div class="day-grid">
+                <div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name weekend">Fri</div><div class="day-name weekend">Sat</div>
+                <div></div>
+                <div class="day-cell" data-date="2025-12-1"><div class="day-number">1</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-2"><div class="day-number">2</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-3"><div class="day-number">3</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-4"><div class="day-number">4</div><div class="day-info">39</div></div>
+                <div class="day-cell weekend" data-date="2025-12-5"><div class="day-number">5</div><div class="day-info">30</div></div>
+                <div class="day-cell weekend" data-date="2025-12-6"><div class="day-number">6</div><div class="day-info">30</div></div>
+                <div class="day-cell" data-date="2025-12-7"><div class="day-number">7</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-8"><div class="day-number">8</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-9"><div class="day-number">9</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-10"><div class="day-number">10</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-11"><div class="day-number">11</div><div class="day-info">39</div></div>
+                <div class="day-cell weekend" data-date="2025-12-12"><div class="day-number">12</div><div class="day-info">30</div></div>
+                <div class="day-cell weekend" data-date="2025-12-13"><div class="day-number">13</div><div class="day-info">30</div></div>
+                <div class="day-cell" data-date="2025-12-14"><div class="day-number">14</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-15"><div class="day-number">15</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-16"><div class="day-number">16</div><div class="day-info">39</div></div>
+                <div class="day-cell" data-date="2025-12-17"><div class="day-number">17</div><div class="day-info">39</div></div>
+                <div class="day-cell season" data-date="2025-12-18"><div class="day-number">18</div><div class="day-info">15</div></div>
+                <div class="day-cell season weekend" data-date="2025-12-19"><div class="day-number">19</div><div class="day-info">10</div></div>
+                <div class="day-cell season weekend" data-date="2025-12-20"><div class="day-number">20</div><div class="day-info">8</div></div>
+                <div class="day-cell season" data-date="2025-12-21"><div class="day-number">21</div><div class="day-info">8</div></div>
+                <div class="day-cell season" data-date="2025-12-22"><div class="day-number">22</div><div class="day-info">7</div></div>
+                <div class="day-cell season" data-date="2025-12-23"><div class="day-number">23</div><div class="day-info">6</div></div>
+                <div class="day-cell special season" data-date="2025-12-24"><div class="day-number">24</div><div class="day-info">2</div></div>
+                <div class="day-cell special season" data-date="2025-12-25"><div class="day-number">25</div><div class="day-info">1</div></div>
+                <div class="day-cell season weekend" data-date="2025-12-26"><div class="day-number">26</div><div class="day-info">0</div></div>
+                <div class="day-cell season weekend" data-date="2025-12-27"><div class="day-number">27</div><div class="day-info">0</div></div>
+                <div class="day-cell season" data-date="2025-12-28"><div class="day-number">28</div><div class="day-info">0</div></div>
+                <div class="day-cell season" data-date="2025-12-29"><div class="day-number">29</div><div class="day-info">0</div></div>
+                <div class="day-cell special season" data-date="2025-12-30"><div class="day-number">30</div><div class="day-info">0</div></div>
+                <div class="day-cell special season" data-date="2025-12-31"><div class="day-number">31</div><div class="day-info">0</div></div>
             </div>
         </div>
+
+        <div class="calendar-mockup">
+            <div class="month-header">January 2026 (Season Ends 4th Jan)</div>
+            <p style="text-align: center; font-style: italic; color: #888;">... 3 more months of availability data here ...</p>
+        </div>
+
+        <p class="note">**Color Key:** <span style="background-color: #fcf8e3; border: 1px solid #ccc;">&nbsp;&nbsp;&nbsp;</span> Weekend (Fri/Sat) | <span style="background-color: #f7dc6f; border: 1px solid #ccc;">&nbsp;&nbsp;&nbsp;</span> Season Day | <span style="background-color: #e74c3c; color: white;">&nbsp;&nbsp;&nbsp;</span> Special Day (Peak/Low Availability)</p>
     </div>
-</div>
-
-<script>
-    // --- DEMO JAVASCRIPT LOGIC ---
-    // The previous OTP logic is removed to always show the controls.
-    // The calendar selection logic remains for date highlighting.
-
-    const calendarCells = document.querySelectorAll('.day-cell');
-    const checkInInput = document.getElementById('check-in');
-    const checkOutInput = document.getElementById('check-out');
-    
-    // Set initial dummy selection to match the input fields
-    let checkInDate = '2025-10-05';
-    let checkOutDate = '2025-10-08';
-
-    // Initial highlighting on load
-    highlightRange(checkInDate, checkOutDate);
-    
-    calendarCells.forEach(cell => {
-        cell.addEventListener('click', () => {
-            const date = cell.getAttribute('data-date');
-
-            if (!checkInDate || (checkInDate && checkOutDate)) {
-                // Start a new selection
-                resetSelection();
-                checkInDate = date;
-                cell.classList.add('selected');
-            } else if (date === checkInDate) {
-                // Deselect check-in
-                resetSelection();
-            } else if (date > checkInDate) {
-                // Select check-out
-                checkOutDate = date;
-                highlightRange(checkInDate, checkOutDate);
-            } else if (date < checkInDate) {
-                // New check-in, if user clicks a date before current check-in
-                resetSelection();
-                checkInDate = date;
-                cell.classList.add('selected');
-            }
-            
-            checkInInput.value = checkInDate ? checkInDate : 'N/A';
-            checkOutInput.value = checkOutDate ? checkOutDate : 'N/A';
-        });
-    });
-
-    function resetSelection() {
-        checkInDate = null;
-        checkOutDate = null;
-        calendarCells.forEach(c => c.classList.remove('selected'));
-    }
-
-    function highlightRange(start, end) {
-        // Find the actual day elements
-        const startDateEl = document.querySelector(`.day-cell[data-date="${start}"]`);
-        const endDateEl = document.querySelector(`.day-cell[data-date="${end}"]`);
-        
-        if (startDateEl) startDateEl.classList.add('selected');
-
-        calendarCells.forEach(cell => {
-            const date = cell.getAttribute('data-date');
-            // Check-out date is non-inclusive of last night (so range is start <= date < end)
-            if (date >= start && date < end) { 
-                cell.classList.add('selected');
-            }
-        });
-    }
-</script>
-
-</body>
-</html>
