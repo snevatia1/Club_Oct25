@@ -10,30 +10,32 @@
         .app { display: grid; grid-template-columns: 1fr 1fr; height: 100vh; }
         .left-pane { overflow-y: auto; padding: 10px; background: #f9f9f9; }
         .right-pane { overflow-y: auto; padding: 10px; background: white; }
+        .right-pane.locked { opacity: 0.5; pointer-events: none; }
         .header { background: #cc3333; color: white; padding: 10px; position: sticky; top: 0; z-index: 1; text-align: center; }
-        .month { margin-bottom: 15px; } /* Reduced margin */
+        .month { margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #ddd; }
-        .date-cell { background: white; padding: 2px; text-align: center; cursor: pointer; height: 35px; border: 1px solid #ddd; font-size: 14px; position: relative; display: flex; flex-direction: column; justify-content: space-between; } /* Tighter, positioned */
-        .date-num { font-size: 16px; font-weight: bold; align-self: flex-start; } /* Top-left date */
-        .room-qty { font-size: 12px; align-self: flex-end; } /* Bottom-right qty */
+        .date-cell { background: white; padding: 5px; text-align: center; cursor: pointer; min-height: 40px; border: 1px solid #ddd; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
+        .date-num { font-size: 16px; font-weight: bold; align-self: flex-start; }
+        .room-qty { font-size: 12px; align-self: flex-end; }
         .date-cell:hover { background: #e0e0e0; }
         .weekend { background: lightyellow !important; }
         .season { background: gold !important; }
         .special { background: red !important; color: white !important; }
         .selected { background: lightblue !important; }
         .error { color: red; }
-        .section { margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; } /* Tighter sections */
-        .party-row { display: flex; justify-content: space-around; margin: 3px 0; flex-wrap: wrap; } /* Reduced vertical */
-        .filter-row { display: flex; justify-content: space-around; margin: 3px 0; flex-wrap: wrap; }
-        select, input { margin: 2px; padding: 3px; width: 50px; font-size: 12px; } /* Compact */
-        .block-btn { background: #ccc; margin: 1px; padding: 4px; cursor: pointer; font-size: 12px; }
-        #roomList { max-height: 100px; overflow-x: auto; white-space: nowrap; } /* Horizontal row, min scroll */
-        .room-item { display: inline-block; border: 1px solid #ddd; padding: 4px; margin: 2px; background: #f9f9f9; font-size: 12px; min-width: 80px; }
+        .section { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; }
+        .party-row { display: flex; justify-content: space-around; margin: 5px 0; flex-wrap: wrap; }
+        .filter-row { display: flex; justify-content: space-around; margin: 5px 0; flex-wrap: wrap; }
+        select { margin: 5px; padding: 3px; width: 60px; }
+        .block-btn { background: #ccc; margin: 2px; padding: 5px; cursor: pointer; }
+        .room-item { display: inline-block; border: 1px solid #ddd; padding: 5px; margin: 2px; background: #f9f9f9; min-width: 80px; white-space: nowrap; }
         .selected-room { background: lightgreen; }
-        .sticky-summary { position: sticky; bottom: 0; background: white; border-top: 2px solid #cc3333; padding: 10px; font-size: 12px; } /* Compact summary */
-        button { background: #cc3333; color: white; border: none; padding: 4px 8px; cursor: pointer; margin: 1px; font-size: 12px; }
-        .rules-text { max-height: 120px; overflow: auto; border: 1px solid #ccc; padding: 8px; font-size: 11px; background: #f9f9f9; }
-        @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .party-row, .filter-row { flex-direction: column; align-items: center; } #roomList { white-space: normal; } }
+        .sticky-summary { position: sticky; bottom: 0; background: white; border-top: 2px solid #cc3333; padding: 15px; }
+        button { background: #cc3333; color: white; border: none; padding: 5px 10px; cursor: pointer; margin: 2px; }
+        input { margin: 5px; padding: 5px; width: 50px; }
+        .rules-text { max-height: 150px; overflow: auto; border: 1px solid #ccc; padding: 10px; font-size: 12px; background: #f9f9f9; }
+        #roomList { max-height: 200px; overflow: auto; white-space: nowrap; }
+        @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .party-row, .filter-row { flex-direction: column; } #roomList { white-space: normal; } }
     </style>
 </head>
 <body>
@@ -45,73 +47,74 @@
         <div class="right-pane" id="rightPane">
             <div id="otpGate" class="section" style="display:none;"></div>
             <div id="mainContent" style="display:block;">
-                <p style="background:#e0f7e0; padding:5px; font-size:12px; margin:0;">Demo: Logged in as ABC (Mem#123).</p>
+                <p style="background:#e0f7e0; padding:5px;">Demo: Logged in as ABC (Mem#123) – OTP assumed received.</p>
                 <div class="section">
-                    <h3 style="margin:5px 0; font-size:14px;">Dates</h3>
-                    <p id="datesDisplay" style="font-size:12px; margin:5px 0;">Check-in: ? | Check-out: ?</p>
+                    <h3>Dates</h3>
+                    <p id="datesDisplay">Check-in: ? | Check-out: ?</p>
                 </div>
                 <div class="section">
-                    <h3 style="margin:5px 0; font-size:14px;">Party Size</h3>
+                    <h3>Party Size</h3>
                     <div class="party-row">
                         <label>Members: <input type="number" id="members" min="0" value="0" onchange="updateParty()"></label>
                         <label>Seniors: <input type="number" id="seniors" min="0" value="0" onchange="updateParty()"></label>
                     </div>
                     <div class="party-row">
                         <label>Children <10: <input type="number" id="kidsU10" min="0" value="0" onchange="updateParty()"></label>
-                        <label>Deps 10-21: <input type="number" id="deps" min="0" value="0" onchange="updateParty()"></label>
+                        <label>Dependants 10-21: <input type="number" id="deps" min="0" value="0" onchange="updateParty()"></label>
                     </div>
                     <div class="party-row">
                         <label>Temp Adults: <input type="number" id="tempA" min="0" value="0" onchange="updateParty()"></label>
-                        <label>Temp Kids: <input type="number" id="tempK" min="0" value="0" onchange="updateParty()"></label>
+                        <label>Temp Kids 5-10: <input type="number" id="tempK" min="0" value="0" onchange="updateParty()"></label>
                     </div>
                     <div class="party-row">
-                        <label>Group: <input type="number" id="group" min="0" max="19" value="0" onchange="updateParty()"></label>
+                        <label>Group: <input type="number" id="group" min="10" max="19" value="0" onchange="updateParty()"></label>
                     </div>
-                    <p style="font-size:11px; margin:3px 0;">Deps/Children billed as Temp. Group min 10 if >0.</p>
+                    <p>Children (11–21) and Parents are Dependants, billed as Temporary Members.</p>
                 </div>
                 <div class="section">
-                    <h3 style="margin:5px 0; font-size:14px;">Filters (# Rooms)</h3>
+                    <h3>Filters (# Rooms)</h3>
                     <div class="filter-row">
-                        <label>Wheel: <select id="wheel" onchange="updateFilters()"><option value="0">0</option></select></label>
+                        <label>Wheelchair: <select id="wheel" onchange="updateFilters()"><option value="0">0</option></select></label>
                         <label>Pet: <select id="pet" onchange="updateFilters()"><option value="0">0</option></select></label>
                         <label>AC: <select id="ac" onchange="updateFilters()"><option value="0">0</option></select></label>
                     </div>
                     <div class="filter-row">
                         <label>Single: <select id="single" onchange="updateFilters()"><option value="0">0</option></select></label>
                         <label>4 Beds: <select id="quad" onchange="updateFilters()"><option value="0">0</option></select></label>
+                        <label>Group Rooms: <select id="groupR" onchange="updateFilters()"><option value="0">0</option></select></label>
                     </div>
-                    <p id="filterCounts" style="font-size:12px; margin:5px 0;">Matching: 39 rooms</p>
+                    <p id="filterCounts">Matching: 39 rooms</p>
                 </div>
                 <div class="section">
-                    <h3 style="margin:5px 0; font-size:14px;">Availability</h3>
+                    <h3>Availability (After Filters & Selected)</h3>
                     <div id="blockChips"></div>
-                    <p style="font-size:11px; margin:3px 0;">Click block for rooms (horizontal list).</p>
+                    <p>Click block for rooms. Partial: Auto-chain for spans.</p>
                     <div id="roomList"></div>
                 </div>
                 <div class="section">
-                    <h3 style="margin:5px 0; font-size:14px;">Meals</h3>
-                    <label style="display:inline-block; margin:2px;">Veg: <input type="number" id="veg" min="0" value="0" onchange="updateMeals()"></label>
-                    <label style="display:inline-block; margin:2px;">Non-Veg: <input type="number" id="nonveg" min="0" value="0" onchange="updateMeals()"></label>
-                    <p id="mealsError" class="error" style="font-size:11px; margin:3px 0;"></p>
+                    <h3>Meals</h3>
+                    <label>Veg: <input type="number" id="veg" min="0" value="0" onchange="updateMeals()"></label>
+                    <label>Non-Veg: <input type="number" id="nonveg" min="0" value="0" onchange="updateMeals()"></label>
+                    <p id="mealsError" class="error"></p>
                 </div>
                 <div class="sticky-summary section">
-                    <h3 style="margin:5px 0; font-size:14px;">Summary</h3>
-                    <p id="summaryDates" style="font-size:12px; margin:2px 0;"></p>
-                    <p id="summaryParty" style="font-size:12px; margin:2px 0;"></p>
-                    <p id="summaryRooms" style="font-size:12px; margin:2px 0;">Rooms: 0 selected</p>
-                    <p id="summaryFilters" style="font-size:12px; margin:2px 0;">Filters: None</p>
-                    <p id="summaryTotal" style="font-size:12px; margin:2px 0;">Est. Total: ₹0</p>
-                    <p id="disclaimer" style="font-size:11px; margin:2px 0;"></p>
-                    <button onclick="toggleRules()" style="font-size:11px;">Rules</button>
+                    <h3>Summary</h3>
+                    <p id="summaryDates"></p>
+                    <p id="summaryParty"></p>
+                    <p id="summaryRooms">Rooms: 0 selected</p>
+                    <p id="summaryFilters">Filters: None</p>
+                    <p id="summaryTotal">Est. Total: ₹0</p>
+                    <p id="disclaimer"></p>
+                    <button onclick="toggleRules()">Rules</button>
                     <div id="rulesPanel" class="rules-text" style="display:none;"></div>
-                    <label style="display:inline-block; margin:2px;"><input type="checkbox" id="accept" onchange="updateSummary()"> Accept</label>
-                    <button onclick="confirmBooking()" id="confirmBtn" disabled style="font-size:11px;">Confirm</button>
+                    <label><input type="checkbox" id="accept" onchange="updateSummary()"> I Accept</label>
+                    <button onclick="confirmBooking()" id="confirmBtn" disabled>Confirm</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        let data = {/* Inline fallback as before */};
+        let data = { policy: { messages: { header: 'Booking days for Member & Groups 180, Member + Temp M 90, Only Temp M 60. Choose in & out dates below.', disclaimer: 'The Club will try to give the rooms and types you selected but may change the same as per availability at the time of booking.', dues_pending: 'Dues pending. Contact office.', meals_mismatch: 'Veg + Non-Veg must equal total occupants.', window_exceeded_temp: 'Temp-only bookings can be made up to $1 days in advance for these dates.' } }, seasons: [{from:'2025-10-17',to:'2025-11-02',tag:'season'}, {from:'2025-12-19',to:'2026-01-04',tag:'season'}, {from:'2026-01-23',to:'2026-01-26',tag:'special'}], rooms: [ /* Full rooms array from data.json */ {block:'A',room_no:'A-1',type:'double',wheelchair:true,pet:false,ac:false,group:true}, /* ... all 37 rooms ... */ {block:'New E',room_no:'E-7',type:'double',wheelchair:true,pet:false,ac:true,group:false} ], dues: {123:0,234:20}, rules: 'Full rules text...' };
         let state = { checkIn: null, checkOut: null, party: {members:0,seniors:0,kidsU10:0,deps:0,tempA:0,tempK:0,group:0}, filters: {wheel:0,pet:0,ac:0,single:0,quad:0,groupR:0}, verified: true, veg:0, nonveg:0, accept: false, selected: [], selectedRooms: 0 };
         const currentDate = new Date('2025-10-26');
         const blocks = ['A', 'B', 'Old C', 'New C', 'D', 'Old E', 'New E'];
@@ -123,8 +126,9 @@
             document.getElementById('disclaimer').innerText = data.policy.messages.disclaimer;
             document.getElementById('rulesPanel').innerText = data.rules;
             generateCalendar();
-            updateFilters();
+            updateFilters(); // Populates dropdowns and blocks
             updateSummary();
+            updateDatesDisplay();
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('otpGate').style.display = 'none';
             document.getElementById('rightPane').classList.remove('locked');
@@ -135,19 +139,19 @@
             let month = new Date('2025-10-01');
             for (let m = 0; m < 6; m++) {
                 const div = document.createElement('div'); div.className = 'month';
-                div.innerHTML = `<h3 style="font-size:14px; margin:5px 0;">${month.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</h3><div class="grid">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div style="font-size:11px;">${d}</div>`).join('')}</div>`;
+                div.innerHTML = `<h3>${month.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</h3><div class="grid">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div>${d}</div>`).join('')}</div>`;
                 const grid = div.querySelector('.grid');
                 for (let i = 0; i < 42; i++) {
-                    const date = new Date(month.getFullYear(), month.getMonth(), 1); // Fix date creation
-                    date.setDate(i + 1 - date.getDay()); // Proper day calc
+                    const date = new Date(month.getFullYear(), month.getMonth(), 1);
+                    date.setDate(i + 1 - date.getDay());
                     if (date.getMonth() !== month.getMonth()) { grid.innerHTML += '<div></div>'; continue; }
                     const cell = document.createElement('div'); cell.className = 'date-cell';
-                    cell.innerHTML = `<div class="date-num">${date.getDate()}</div><div class="room-qty">39</div>`; // Positioned
+                    cell.innerHTML = `<div class="date-num">${date.getDate()}</div><div class="room-qty">39</div>`;
                     if (isWeekend(date)) cell.classList.add('weekend');
                     const seasonTag = getSeasonTag(date);
                     if (seasonTag) cell.classList.add(seasonTag);
                     if (state.checkIn && state.checkOut && date >= state.checkIn && date <= state.checkOut) cell.classList.add('selected');
-                    cell.onclick = () => selectDate(new Date(date)); // Clone
+                    cell.onclick = () => selectDate(new Date(date.getTime()));
                     grid.appendChild(cell);
                 }
                 cal.appendChild(div);
@@ -156,16 +160,26 @@
         }
 
         function selectDate(date) {
-            if (!state.checkIn || date < state.checkIn) {
-                state.checkIn = date;
-                state.checkOut = null;
+            if (!state.checkIn) {
+                state.checkIn = new Date(date.getTime());
             } else if (!state.checkOut) {
-                state.checkOut = date;
-            } else if (date > state.checkOut) {
-                state.checkOut = date;
+                if (date > state.checkIn) {
+                    state.checkOut = new Date(date.getTime());
+                } else {
+                    state.checkIn = new Date(date.getTime());
+                }
             } else {
-                state.checkIn = date;
-                state.checkOut = null;
+                if (date < state.checkIn) {
+                    state.checkIn = new Date(date.getTime());
+                    state.checkOut = null;
+                } else if (date > state.checkOut) {
+                    state.checkOut = new Date(date.getTime());
+                } else {
+                    const mid = new Date(state.checkIn.getTime());
+                    mid.setDate(mid.getDate() + Math.floor((date - state.checkIn) / (1000*60*60*24)));
+                    state.checkIn = new Date(date.getTime());
+                    state.checkOut = new Date(mid.getTime());
+                }
             }
             generateCalendar();
             updateSummary();
@@ -178,7 +192,11 @@
             document.getElementById('datesDisplay').innerText = `Check-in: ${inStr} | Check-out: ${outStr}`;
         }
 
-        // ... (rest of functions same as previous, with group added to party/state/updateParty: state.party.group = +document.getElementById('group').value; if (state.party.group > 0 && state.party.group < 10) alert('Group min 10'); estRooms += state.party.group; )
+        function isWeekend(d) { return d.getDay() === 0 || d.getDay() === 6; }
+        function getSeasonTag(d) {
+            const s = data.seasons.find(se => d >= new Date(se.from) && d <= new Date(se.to));
+            return s ? s.tag : null;
+        }
 
         function updateParty() {
             state.party.members = +document.getElementById('members').value;
@@ -188,16 +206,121 @@
             state.party.tempA = +document.getElementById('tempA').value;
             state.party.tempK = +document.getElementById('tempK').value;
             state.party.group = +document.getElementById('group').value;
-            if (state.party.group > 0 && state.party.group < 10) { alert('Group min 10 rooms'); document.getElementById('group').value = 0; state.party.group = 0; }
-            // ... (rules check same, estRooms = Math.ceil((Object.values(state.party).reduce((a,b)=>a+b,0) - state.party.group) / 2) + state.party.group; )
+            if (state.party.group > 0 && state.party.group < 10) {
+                alert('Group min 10 rooms');
+                document.getElementById('group').value = 0;
+                state.party.group = 0;
+            }
+            if (state.checkIn) {
+                const daysAhead = Math.ceil((state.checkIn - currentDate) / (1000*60*60*24));
+                let maxDays = 180;
+                const hasTemp = state.party.tempA + state.party.tempK > 0 || state.party.deps > 0;
+                const onlyTemp = state.party.members + state.party.seniors === 0;
+                if (onlyTemp) maxDays = 60;
+                else if (hasTemp) maxDays = 90;
+                if (daysAhead > maxDays) alert(data.policy.messages.window_exceeded_temp.replace('$1', maxDays.toString()));
+            }
+            const totalP = Object.values(state.party).reduce((a,b)=>a+b,0);
+            const isWknd = state.checkIn && isWeekend(state.checkIn);
+            const estRooms = Math.ceil((totalP - state.party.group) / 2) + state.party.group;
+            const maxRooms = isWknd ? 3 : 6;
+            if (estRooms > maxRooms && state.party.group === 0) alert(`Cap: ${isWknd ? 'Weekend max 3' : 'Weekday max 6'} rooms (est. ${estRooms}).`);
             updateSummary(); updateMeals();
         }
 
-        // In updateSummary, summaryParty includes `Group: ${state.party.group}`
+        function updateFilters() {
+            state.filters.wheel = +document.getElementById('wheel').value;
+            state.filters.pet = +document.getElementById('pet').value;
+            state.filters.ac = +document.getElementById('ac').value;
+            state.filters.single = +document.getElementById('single').value;
+            state.filters.quad = +document.getElementById('quad').value;
+            state.filters.groupR = +document.getElementById('groupR').value;
+            // Dynamic max for dropdowns (stub deduct selected)
+            const avail = getFilteredRooms().length;
+            ['wheel','pet','ac','single','quad','groupR'].forEach(f => {
+                const sel = document.getElementById(f);
+                sel.innerHTML = '<option value="0">0</option>';
+                const maxF = f === 'groupR' ? Math.min(19, avail) : avail;
+                for (let i = 1; i <= maxF; i++) sel.innerHTML += `<option value="${i}">${i}</option>`;
+            });
+            document.getElementById('filterCounts').innerText = `Matching: ${avail} rooms`;
+            updateBlockChips();
+            updateSummary();
+        }
 
-        // Room list: Already horizontal (#roomList overflow-x: auto; white-space: nowrap; .room-item inline-block)
+        function getFilteredRooms() {
+            return data.rooms.filter(r => 
+                (state.filters.wheel === 0 || r.wheelchair) && (state.filters.pet === 0 || r.pet) &&
+                (state.filters.ac === 0 || r.ac) && (state.filters.single === 0 || r.type === 'single') &&
+                (state.filters.quad === 0 || r.type === 'quad')
+            ).filter(r => !state.selected.some(s => s.room_no === r.room_no));
+        }
 
-        // Other functions unchanged
+        function updateBlockChips() {
+            const chips = document.getElementById('blockChips');
+            chips.innerHTML = '';
+            blocks.forEach(b => {
+                const count = getFilteredRooms().filter(r => r.block === b).length;
+                const btn = document.createElement('button'); btn.className = 'block-btn';
+                btn.innerText = `${b} (${count})`;
+                btn.onclick = () => showRooms(b);
+                chips.appendChild(btn);
+            });
+        }
+
+        function showRooms(block) {
+            const list = document.getElementById('roomList');
+            const avail = getFilteredRooms().filter(r => r.block === block);
+            list.innerHTML = `<h4>Rooms in ${block}:</h4>`;
+            avail.forEach(r => {
+                const div = document.createElement('div'); div.className = `room-item ${state.selected.some(s => s.room_no === r.room_no) ? 'selected-room' : ''}`;
+                div.innerHTML = `${r.room_no} ${state.checkOut && (state.checkOut - state.checkIn) / (1000*60*60*24) > 1 && Math.random()<0.1 ? '(Partial)' : ''} <button onclick="selectRoom('${r.room_no}')">Select</button>`;
+                list.appendChild(div);
+            });
+            if (avail.length === 0) list.innerHTML += '<p>No rooms available.</p>';
+        }
+
+        function selectRoom(roomNo) {
+            if (!state.selected.some(s => s.room_no === roomNo)) {
+                const room = data.rooms.find(r => r.room_no === roomNo);
+                state.selected.push(room);
+                state.selectedRooms++;
+                updateBlockChips();
+                updateSummary();
+                alert(`Selected ${roomNo}`);
+            }
+        }
+
+        function updateMeals() {
+            state.veg = +document.getElementById('veg').value; state.nonveg = +document.getElementById('nonveg').value;
+            const total = Object.values(state.party).reduce((a,b)=>a+b,0);
+            if (state.veg + state.nonveg !== total) document.getElementById('mealsError').innerText = data.policy.messages.meals_mismatch;
+            else document.getElementById('mealsError').innerText = '';
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const totalP = Object.values(state.party).reduce((a,b)=>a+b,0);
+            const nights = state.checkIn && state.checkOut ? Math.ceil((state.checkOut - state.checkIn) / (1000*60*60*24)) : 0;
+            document.getElementById('summaryDates').innerText = `${nights} nights`;
+            document.getElementById('summaryParty').innerText = `Occupants: Total ${totalP} (Group: ${state.party.group})`;
+            document.getElementById('summaryRooms').innerText = `Rooms: ${state.selectedRooms} selected`;
+            document.getElementById('summaryFilters').innerText = `Filters: Wheel${state.filters.wheel} Pet${state.filters.pet} AC${state.filters.ac} Single${state.filters.single} Quad${state.filters.quad} GroupR${state.filters.groupR}`;
+            document.getElementById('summaryTotal').innerText = `Est. Total: ₹${totalP * 5250 * nights}`;
+            state.accept = document.getElementById('accept').checked;
+            const valid = state.accept && totalP > 0 && state.checkIn && state.checkOut && (state.veg + state.nonveg === totalP);
+            document.getElementById('confirmBtn').disabled = !valid;
+        }
+
+        function toggleRules() {
+            const p = document.getElementById('rulesPanel'); p.style.display = p.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function confirmBooking() {
+            alert('Demo Confirmed! Email/PDF sent (stub).');
+            console.log('Booking PDF Data:', state);
+            if (getSeasonTag(state.checkIn)) alert('Season: Courier signed form & ID 15 days in advance.');
+        }
     </script>
 </body>
 </html>
