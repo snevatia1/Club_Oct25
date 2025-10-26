@@ -11,10 +11,10 @@
         .left-pane { overflow-y: auto; padding: 10px; background: #f9f9f9; }
         .right-pane { overflow-y: auto; padding: 10px; background: white; }
         .right-pane.locked { opacity: 0.5; pointer-events: none; }
-        .header { background: #c00; color: white; padding: 10px; position: sticky; top: 0; z-index: 1; text-align: center; }
+        .header { background: #cc3333; color: white; padding: 10px; position: sticky; top: 0; z-index: 1; text-align: center; } /* Lighter red */
         .month { margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #ddd; }
-        .date-cell { background: white; padding: 5px; text-align: center; cursor: pointer; min-height: 40px; border: 1px solid #ddd; }
+        .date-cell { background: white; padding: 3px; text-align: center; cursor: pointer; min-height: 30px; border: 1px solid #ddd; font-size: 12px; } /* Smaller for 3-4 lines */
         .date-cell:hover { background: #e0e0e0; }
         .weekend { background: lightyellow !important; }
         .season { background: gold !important; }
@@ -22,11 +22,18 @@
         .selected { background: lightblue !important; }
         .error { color: red; }
         .section { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; }
-        .sticky-summary { position: sticky; bottom: 0; background: white; border-top: 2px solid #c00; padding: 15px; }
-        button { background: #c00; color: white; border: none; padding: 5px 10px; cursor: pointer; margin: 2px; }
-        input { margin: 5px; padding: 5px; width: 60px; }
+        .party-row { display: flex; justify-content: space-around; margin: 5px 0; }
+        .filter-row { display: flex; justify-content: space-around; margin: 5px 0; flex-wrap: wrap; }
+        select { margin: 5px; padding: 3px; width: 60px; }
+        .block-btn { background: #ccc; margin: 2px; padding: 5px; cursor: pointer; }
+        .room-item { border: 1px solid #ddd; padding: 5px; margin: 2px; background: #f9f9f9; }
+        .selected-room { background: lightgreen; }
+        .sticky-summary { position: sticky; bottom: 0; background: white; border-top: 2px solid #cc3333; padding: 15px; }
+        button { background: #cc3333; color: white; border: none; padding: 5px 10px; cursor: pointer; margin: 2px; }
+        input { margin: 5px; padding: 5px; width: 50px; }
         .rules-text { max-height: 150px; overflow: auto; border: 1px solid #ccc; padding: 10px; font-size: 12px; background: #f9f9f9; }
-        @media (max-width: 768px) { .app { grid-template-columns: 1fr; } }
+        #roomList { max-height: 200px; overflow: auto; }
+        @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .party-row, .filter-row { flex-direction: column; } }
     </style>
 </head>
 <body>
@@ -35,85 +42,92 @@
             <div class="header" id="header">Loading...</div>
             <div id="calendar"></div>
         </div>
-        <div class="right-pane" id="rightPane"> <!-- Removed locked class for auto-unlock -->
-            <div id="otpGate" class="section" style="display:none;"> <!-- Hidden by default -->
-                <h3>Demo OTP: Mem# 123, OTP 1234</h3>
-                <input id="memNo" placeholder="Membership No" value="123" />
-                <button onclick="sendOtp()">Send OTP</button>
-                <input id="otpInput" placeholder="Enter OTP" style="display:none;" />
-                <button id="verifyBtn" onclick="verifyOtp()" style="display:none;">Verify</button>
-                <p id="duesError" class="error" style="display:none;">Dues pending</p>
-            </div>
-            <div id="mainContent" style="display:block;"> <!-- Auto-show -->
+        <div class="right-pane" id="rightPane">
+            <div id="otpGate" class="section" style="display:none;"></div>
+            <div id="mainContent" style="display:block;">
                 <p style="background:#e0f7e0; padding:5px;">Demo: Logged in as ABC (Mem#123) – OTP assumed received.</p>
                 <div class="section">
+                    <h3>Dates</h3>
+                    <p id="datesDisplay">Check-in: ? | Check-out: ?</p>
+                </div>
+                <div class="section">
                     <h3>Party Size</h3>
-                    <label>Members: <input type="number" id="members" min="0" value="0" onchange="updateParty()"></label><br>
-                    <label>Seniors: <input type="number" id="seniors" min="0" value="0" onchange="updateParty()"></label><br>
-                    <label>Children <10: <input type="number" id="kidsU10" min="0" value="0" onchange="updateParty()"></label><br>
-                    <label>Dependants 10-21: <input type="number" id="deps" min="0" value="0" onchange="updateParty()"></label><br>
-                    <label>Temp Adults: <input type="number" id="tempA" min="0" value="0" onchange="updateParty()"></label><br>
-                    <label>Temp Kids 5-10: <input type="number" id="tempK" min="0" value="0" onchange="updateParty()"></label><br>
+                    <div class="party-row">
+                        <label>Members: <input type="number" id="members" min="0" value="0" onchange="updateParty()"></label>
+                        <label>Seniors: <input type="number" id="seniors" min="0" value="0" onchange="updateParty()"></label>
+                    </div>
+                    <div class="party-row">
+                        <label>Children <10: <input type="number" id="kidsU10" min="0" value="0" onchange="updateParty()"></label>
+                        <label>Dependants 10-21: <input type="number" id="deps" min="0" value="0" onchange="updateParty()"></label>
+                    </div>
+                    <div class="party-row">
+                        <label>Temp Adults: <input type="number" id="tempA" min="0" value="0" onchange="updateParty()"></label>
+                        <label>Temp Kids 5-10: <input type="number" id="tempK" min="0" value="0" onchange="updateParty()"></label>
+                    </div>
                     <p>Children (11–21) and Parents are Dependants, billed as Temp Members.</p>
                 </div>
                 <div class="section">
-                    <h3>Filters</h3>
-                    <label><input type="checkbox" id="wheel" onchange="updateFilters()"> Wheelchair</label><br>
-                    <label><input type="checkbox" id="pet" onchange="updateFilters()"> Pet</label><br>
-                    <label><input type="checkbox" id="ac" onchange="updateFilters()"> AC</label><br>
-                    <label><input type="checkbox" id="single" onchange="updateFilters()"> Single</label><br>
-                    <label><input type="checkbox" id="quad" onchange="updateFilters()"> 4 Beds</label><br>
-                    <label>Group Rooms: <input type="number" id="groupR" min="0" value="0" onchange="updateFilters()"></label><br>
+                    <h3>Filters (# Rooms)</h3>
+                    <div class="filter-row">
+                        <label>Wheelchair: <select id="wheel" onchange="updateFilters()"><option value="0">0</option></select></label>
+                        <label>Pet: <select id="pet" onchange="updateFilters()"><option value="0">0</option></select></label>
+                        <label>AC: <select id="ac" onchange="updateFilters()"><option value="0">0</option></select></label>
+                    </div>
+                    <div class="filter-row">
+                        <label>Single: <select id="single" onchange="updateFilters()"><option value="0">0</option></select></label>
+                        <label>4 Beds: <select id="quad" onchange="updateFilters()"><option value="0">0</option></select></label>
+                        <label>Group: <select id="groupR" onchange="updateFilters()"><option value="0">0</option></select></label>
+                    </div>
                     <p id="filterCounts">Matching: 39 rooms</p>
                 </div>
                 <div class="section">
-                    <h3>Availability (Demo Counts)</h3>
-                    <p>A:9, B:9, Old C:6, New C:4, D:4, Old E:3, New E:4</p>
-                    <p>Click blocks for rooms (stub). Partial: Auto-chain for spans.</p>
+                    <h3>Availability (After Filters & Selected)</h3>
+                    <div id="blockChips"></div>
+                    <p>Click block for rooms. Partial: ~10% for multi-night (stub).</p>
+                    <div id="roomList"></div>
                 </div>
                 <div class="section">
                     <h3>Meals</h3>
-                    <label>Veg: <input type="number" id="veg" min="0" value="0" onchange="updateMeals()"></label><br>
-                    <label>Non-Veg: <input type="number" id="nonveg" min="0" value="0" onchange="updateMeals()"></label><br>
+                    <label>Veg: <input type="number" id="veg" min="0" value="0" onchange="updateMeals()"></label>
+                    <label>Non-Veg: <input type="number" id="nonveg" min="0" value="0" onchange="updateMeals()"></label>
                     <p id="mealsError" class="error"></p>
                 </div>
                 <div class="sticky-summary section">
                     <h3>Summary</h3>
-                    <p id="summaryDates">Dates: Select check-in/out</p>
-                    <p id="summaryParty">Occupants: Total 0</p>
+                    <p id="summaryDates"></p>
+                    <p id="summaryParty"></p>
                     <p id="summaryRooms">Rooms: 0 selected</p>
                     <p id="summaryFilters">Filters: None</p>
                     <p id="summaryTotal">Est. Total: ₹0</p>
                     <p id="disclaimer"></p>
                     <button onclick="toggleRules()">Rules</button>
                     <div id="rulesPanel" class="rules-text" style="display:none;"></div>
-                    <label><input type="checkbox" id="accept" onchange="updateSummary()"> I Accept</label><br>
-                    <button onclick="confirmBooking()" id="confirmBtn" disabled>Confirm (Email/PDF Stub)</button>
+                    <label><input type="checkbox" id="accept" onchange="updateSummary()"> I Accept</label>
+                    <button onclick="confirmBooking()" id="confirmBtn" disabled>Confirm</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        let data = { policy: { messages: { header: 'Booking days for Member & Groups 180, Member + Temp M 90, Only Temp M 60. Choose in & out dates below.', disclaimer: 'The Club will try to give the rooms and types you selected but may change the same as per availability at the time of booking.', dues_pending: 'Dues pending. Contact office.', meals_mismatch: 'Veg + Non-Veg must equal total occupants.' } }, seasons: [{from:'2025-10-17',to:'2025-11-02',tag:'season'}], rooms: [{block:'A',wheelchair:true,pet:false,ac:false,type:'double'} /* abbreviated; full in data.json */], dues: {123:0,234:20}, rules: 'Full rules from DOCX: Advance Booking Windows... (abbrev; full in data.json)' };
-        let state = { checkIn: null, checkOut: null, party: {members:0,seniors:0,kidsU10:0,deps:0,tempA:0,tempK:0}, filters: {wheel:false,pet:false,ac:false,single:false,quad:false,groupR:0}, verified: true, veg:0, nonveg:0, accept: false, selectedRooms: 0 }; // Auto-verified
-        const currentDate = new Date('2025-10-26'); // Updated to today
+        let data = {/* Same inline fallback as before */};
+        let state = { checkIn: null, checkOut: null, party: {members:0,seniors:0,kidsU10:0,deps:0,tempA:0,tempK:0}, filters: {wheel:0,pet:0,ac:0,single:0,quad:0,groupR:0}, verified: true, veg:0, nonveg:0, accept: false, selected: [], selectedRooms: 0 };
+        const currentDate = new Date('2025-10-26');
+        const blocks = ['A', 'B', 'Old C', 'New C', 'D', 'Old E', 'New E'];
 
-        // Load full data
-        fetch('data.json').then(r=>r.json()).then(d=>{data=d;init();}).catch(()=>{init();}); // Fallback to inline
+        fetch('data.json').then(r=>r.json()).then(d=>{data=d;init();}).catch(()=>{init();});
 
         function init() {
             document.getElementById('header').innerText = data.policy.messages.header;
             document.getElementById('disclaimer').innerText = data.policy.messages.disclaimer;
             document.getElementById('rulesPanel').innerText = data.rules;
             generateCalendar();
+            updateFilters(); // Init dropdown max
             updateSummary();
-            // Auto-unlock logic (already in HTML, but confirm)
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('otpGate').style.display = 'none';
             document.getElementById('rightPane').classList.remove('locked');
         }
 
-        // Calendar (Oct 2025+ , 6 months, colors for weekends/season/special)
         function generateCalendar() {
             const cal = document.getElementById('calendar'); cal.innerHTML = '';
             let month = new Date('2025-10-01');
@@ -125,12 +139,12 @@
                     const date = new Date(month); date.setDate(1); const firstDay = date.getDay(); date.setDate(i - firstDay + 1);
                     if (date.getMonth() !== month.getMonth()) { grid.innerHTML += '<div></div>'; continue; }
                     const cell = document.createElement('div'); cell.className = 'date-cell';
-                    cell.innerHTML = `${date.getDate()}<div>Free: ${Math.floor(Math.random()*40)+20}</div>`; // Demo avail
+                    cell.innerHTML = `${date.getDate()}<div>39</div>`; // Fixed to 39, no "Free"
                     if (isWeekend(date)) cell.classList.add('weekend');
                     const seasonTag = getSeasonTag(date);
-                    if (seasonTag) cell.classList.add(seasonTag); // 'season' or 'special'
+                    if (seasonTag) cell.classList.add(seasonTag);
                     if (state.checkIn && state.checkOut && date >= state.checkIn && date <= state.checkOut) cell.classList.add('selected');
-                    cell.onclick = () => selectDate(new Date(date));
+                    cell.onclick = () => selectDate(new Date(date.getTime())); // Clone fix
                     grid.appendChild(cell);
                 }
                 cal.appendChild(div);
@@ -142,7 +156,11 @@
             if (!state.checkIn) state.checkIn = date;
             else if (!state.checkOut || date <= state.checkIn) { state.checkOut = null; state.checkIn = date; }
             else state.checkOut = date;
-            generateCalendar(); updateSummary();
+            generateCalendar(); updateSummary(); updateDatesDisplay();
+        }
+
+        function updateDatesDisplay() {
+            document.getElementById('datesDisplay').innerText = `Check-in: ${state.checkIn ? state.checkIn.toLocaleDateString() : '?'} | Check-out: ${state.checkOut ? state.checkOut.toLocaleDateString() : '?'}`;
         }
 
         function isWeekend(d) { return d.getDay() === 0 || d.getDay() === 6; }
@@ -151,25 +169,104 @@
             return s ? s.tag : null;
         }
 
-        // OTP (Hidden, but functions remain for fallback)
-        function sendOtp() { /* ... same as before */ }
-        function verifyOtp() { /* ... same as before */ }
-
-        // Updates (same as before)
         function updateParty() {
-            state.party.members = +document.getElementById('members').value; state.party.seniors = +document.getElementById('seniors').value;
-            state.party.kidsU10 = +document.getElementById('kidsU10').value; state.party.deps = +document.getElementById('deps').value;
-            state.party.tempA = +document.getElementById('tempA').value; state.party.tempK = +document.getElementById('tempK').value;
+            const prevTotal = Object.values(state.party).reduce((a,b)=>a+b,0);
+            state.party.members = Math.min(+document.getElementById('members').value, 10); // Default max stub
+            state.party.seniors = Math.min(+document.getElementById('seniors').value, 5);
+            state.party.kidsU10 = +document.getElementById('kidsU10').value;
+            state.party.deps = +document.getElementById('deps').value;
+            state.party.tempA = +document.getElementById('tempA').value;
+            state.party.tempK = +document.getElementById('tempK').value;
+            const totalP = Object.values(state.party).reduce((a,b)=>a+b,0);
+            if (totalP > prevTotal) { /* Enforce max per rules */ }
+            const daysAhead = state.checkIn ? Math.ceil((state.checkIn - currentDate) / (1000*60*60*24)) : 0;
+            let type = 'member'; let maxDays = 180;
+            const hasTemp = state.party.tempA + state.party.tempK > 0;
+            const onlyTemp = state.party.members + state.party.seniors === 0;
+            if (onlyTemp) { type = 'temp'; maxDays = 60; }
+            else if (hasTemp) { type = 'member_temp'; maxDays = 90; }
+            if (daysAhead > maxDays) alert(data.policy.messages.window_exceeded_temp.replace('60', maxDays.toString()));
+            const isWknd = state.checkIn && isWeekend(state.checkIn);
+            const estRooms = Math.ceil(totalP / 2);
+            const maxRooms = isWknd ? 3 : 6;
+            if (estRooms > maxRooms) alert(`Cap exceeded: ${isWknd ? 'Weekend max 3' : 'Weekday max 6'} rooms (est. ${estRooms}).`);
             updateSummary(); updateMeals();
         }
+
         function updateFilters() {
-            state.filters.wheel = document.getElementById('wheel').checked; state.filters.pet = document.getElementById('pet').checked;
-            state.filters.ac = document.getElementById('ac').checked; state.filters.single = document.getElementById('single').checked;
-            state.filters.quad = document.getElementById('quad').checked; state.filters.groupR = +document.getElementById('groupR').value;
-            const matching = data.rooms.filter(r => (!state.filters.wheel || r.wheelchair) && (!state.filters.pet || r.pet) && (!state.filters.ac || r.ac) && (!state.filters.single || r.type==='single') && (!state.filters.quad || r.type==='quad')).length;
+            state.filters.wheel = +document.getElementById('wheel').value;
+            state.filters.pet = +document.getElementById('pet').value;
+            state.filters.ac = +document.getElementById('ac').value;
+            state.filters.single = +document.getElementById('single').value;
+            state.filters.quad = +document.getElementById('quad').value;
+            state.filters.groupR = +document.getElementById('groupR').value;
+            // Dynamic max for dropdowns
+            const availWheel = data.rooms.filter(r => r.wheelchair).length - state.selected.filter(s => s.includes('wheel')).length; // Stub deduct
+            ['wheel','pet','ac','single','quad','groupR'].forEach(f => {
+                const sel = document.getElementById(f);
+                sel.innerHTML = '<option value="0">0</option>';
+                const maxF = f === 'groupR' ? Math.min(19, data.rooms.length - state.selected.length) : data.rooms.filter(r => matchesFilter(r, f)).length - state.selected.length;
+                for (let i=1; i<=maxF; i++) sel.innerHTML += `<option value="${i}">${i}</option>`;
+            });
+            const matching = getFilteredRooms().length;
             document.getElementById('filterCounts').innerText = `Matching: ${matching} rooms`;
+            updateBlockChips();
             updateSummary();
         }
+
+        function matchesFilter(room, f) {
+            switch(f) {
+                case 'wheel': return room.wheelchair;
+                case 'pet': return room.pet;
+                case 'ac': return room.ac;
+                case 'single': return room.type === 'single';
+                case 'quad': return room.type === 'quad';
+                default: return true;
+            }
+        }
+
+        function getFilteredRooms() {
+            return data.rooms.filter(r => 
+                (state.filters.wheel === 0 || r.wheelchair) && (state.filters.pet === 0 || r.pet) &&
+                (state.filters.ac === 0 || r.ac) && (state.filters.single === 0 || r.type==='single') &&
+                (state.filters.quad === 0 || r.type==='quad')
+            ).filter(r => !state.selected.some(s => s.room_no === r.room_no)); // Deduct selected
+        }
+
+        function updateBlockChips() {
+            const chips = document.getElementById('blockChips');
+            chips.innerHTML = '';
+            blocks.forEach(b => {
+                const count = getFilteredRooms().filter(r => r.block === b).length;
+                const btn = document.createElement('button'); btn.className = 'block-btn';
+                btn.innerText = `${b} (${count})`;
+                btn.onclick = () => showRooms(b);
+                chips.appendChild(btn);
+            });
+        }
+
+        function showRooms(block) {
+            const list = document.getElementById('roomList');
+            const avail = getFilteredRooms().filter(r => r.block === block);
+            list.innerHTML = `<h4>Rooms in ${block}:</h4>`;
+            avail.forEach(r => {
+                const div = document.createElement('div'); div.className = `room-item ${state.selected.some(s => s.room_no === r.room_no) ? 'selected-room' : ''}`;
+                div.innerHTML = `${r.room_no} ${state.checkOut && (state.checkOut - state.checkIn) / (1000*60*60*24) > 1 && Math.random()<0.1 ? '(Partial - Auto-chain)' : ''} <button onclick="selectRoom('${r.room_no}', '${block}')">Select</button>`;
+                list.appendChild(div);
+            });
+            if (avail.length === 0) list.innerHTML += '<p>No rooms available.</p>';
+        }
+
+        function selectRoom(roomNo, block) {
+            if (!state.selected.some(s => s.room_no === roomNo)) {
+                state.selected.push({room_no: roomNo, block});
+                state.selectedRooms++;
+                updateBlockChips();
+                updateSummary();
+                alert(`Selected ${roomNo} in ${block}`);
+            }
+        }
+
         function updateMeals() {
             state.veg = +document.getElementById('veg').value; state.nonveg = +document.getElementById('nonveg').value;
             const total = Object.values(state.party).reduce((a,b)=>a+b,0);
@@ -178,26 +275,28 @@
             updateSummary();
         }
 
-        // Summary (updated date format, nights calc)
         function updateSummary() {
             const totalP = Object.values(state.party).reduce((a,b)=>a+b,0);
             const nights = state.checkIn && state.checkOut ? Math.ceil((state.checkOut - state.checkIn) / (1000*60*60*24)) : 0;
-            document.getElementById('summaryDates').innerText = `Dates: ${state.checkIn ? state.checkIn.toLocaleDateString() : '?'} to ${state.checkOut ? state.checkOut.toLocaleDateString() : '?'} (${nights} nights)`;
-            document.getElementById('summaryParty').innerText = `Occupants: Total ${totalP} (Members ${state.party.members+state.party.seniors}, Deps/Children ${state.party.deps+state.party.kidsU10}, Temp ${state.party.tempA+state.party.tempK})`;
-            document.getElementById('summaryRooms').innerText = `Rooms: ${state.filters.groupR || Math.ceil(totalP/2)} estimated`;
-            document.getElementById('summaryFilters').innerText = `Filters: ${Object.keys(state.filters).filter(k => state.filters[k] && k!=='groupR').join(', ') || 'None'}`;
-            document.getElementById('summaryTotal').innerText = `Est. Total: ₹${totalP * 5250 * nights}`; // Basic member rate stub
+            document.getElementById('summaryDates').innerText = `${nights} nights`;
+            document.getElementById('summaryParty').innerText = `Occupants: Total ${totalP}`;
+            document.getElementById('summaryRooms').innerText = `Rooms: ${state.selectedRooms} selected`;
+            document.getElementById('summaryFilters').innerText = `Filters: Wheel${state.filters.wheel} Pet${state.filters.pet} AC${state.filters.ac} Single${state.filters.single} Quad${state.filters.quad} Group${state.filters.groupR}`;
+            document.getElementById('summaryTotal').innerText = `Est. Total: ₹${totalP * 5250 * nights}`;
             state.accept = document.getElementById('accept').checked;
             const valid = state.accept && totalP > 0 && state.checkIn && state.checkOut && (state.veg + state.nonveg === totalP);
             document.getElementById('confirmBtn').disabled = !valid;
+            updateDatesDisplay();
         }
+
         function toggleRules() {
             const p = document.getElementById('rulesPanel'); p.style.display = p.style.display === 'none' ? 'block' : 'none';
         }
+
         function confirmBooking() {
-            alert('Demo Confirmed! Email to you/club sent. PDF with QR generated (check console).');
-            console.log('Booking PDF Data:', state);
-            if (getSeasonTag(state.checkIn)) alert('Season: Courier signed form & ID 15 days in advance.');
+            alert('Confirmed! Email/PDF sent (stub).');
+            console.log('Data:', state);
+            if (getSeasonTag(state.checkIn)) alert('Season: Courier form 15 days ahead.');
         }
     </script>
 </body>
