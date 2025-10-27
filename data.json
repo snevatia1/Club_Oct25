@@ -2,7 +2,7 @@
   "policy": {
     "messages": {
       "header": "Booking days for Member & Groups 180, Member + Temp M 90, Only Temp M 60. Choose in & out dates below.",
-      "disclaimer": "The Club will try to give the rooms and types you selected but may change the same as per availability at the time of booking.",
+      "disclaimer": "The Club will try to give the rooms and types you selected but may change the same as per availability at the time of check-in.",
       "dues_pending": "We couldn’t send the OTP because your account shows outstanding dues. Please contact the office.",
       "meals_mismatch": "Veg + Non-Veg must equal the total number of occupants.",
       "partial_room": "Partial availability: Auto-chain suggested."
